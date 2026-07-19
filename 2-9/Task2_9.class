@@ -1,0 +1,62 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+public class Task2_9 {
+   private static final String USER_NAME = "alice";
+   private static final String USER_PASSWORD = "alice123";
+   private static final String CONST_MSG_SUCCESS = "Login Successful";
+   private static final String CONST_MSG_ERROR_NAME = "Wrong Username";
+   private static final String CONST_MSG_ERROR_PASS = "Wrong Password";
+   private static final String CONST_MSG_ERROR_INPUT = "Wrong Credentials";
+   private static final String MON = "月曜日";
+   private static final String TUE = "火曜日";
+   private static final String WED = "水曜日";
+   private static final String THU = "木曜日";
+   private static final String FRI = "金曜日";
+   private static final String SAT = "土曜日";
+   private static final String SUN = "日曜日";
+   private static final String MSG_WEEKDAY = "平日営業：9:00〜18:00";
+   private static final String MSG_SATURDAY = "土曜営業：10:00〜17:00";
+   private static final String MSG_SUNDAY = "定休日";
+   private static final String MSG_ERROR = "エラー：不正な曜日です";
+
+   public Task2_9() {
+   }
+
+   public static void main(String[] var0) {
+      String var1 = "alice";
+      String var2 = "alice123";
+      if (var1 == "alice" && var2 == "alice123") {
+         System.out.println("Login Successful");
+      }
+
+      if (var1 == "alice" && var2 != "alice123") {
+         System.out.println("Wrong Password");
+      }
+
+      if (var1 != "alice" && var2 == "alice123") {
+         System.out.println("Wrong Username");
+      }
+
+      if (var1 != "alice" && var2 != "alice123") {
+         System.out.println("Wrong Credentials");
+      }
+
+      switch ("水曜日") {
+         case "月曜日":
+         case "火曜日":
+         case "水曜日":
+         case "木曜日":
+         case "金曜日":
+            System.out.println("平日営業：9:00〜18:00");
+            break;
+         case "土曜日":
+            System.out.println("土曜営業：10:00〜17:00");
+            break;
+         case "日曜日":
+            System.out.println("定休日");
+            break;
+         default:
+            System.out.println("エラー：不正な曜日です");
+      }
+
+   }
+}

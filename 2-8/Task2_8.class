@@ -1,0 +1,14 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+public class Task2_8 {
+   public Task2_8() {
+   }
+
+   public static void main(String[] var0) {
+      boolean var1 = true;
+      boolean var2 = true;
+      boolean var3 = true;
+      boolean var4 = true;
+      String var5 = "中央";
+      String var6 = "線";
+   }
+}
