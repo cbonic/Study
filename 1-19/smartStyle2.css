@@ -1,0 +1,172 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    width: 400px;
+    height: 450px;
+}
+
+/* 上部 */
+.header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    width: 400px;
+    height: 100px;
+    padding-right: 20px;
+
+    background-color: #ffce7a;
+}
+
+.header-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 160px;
+    height: 60px;
+    padding: 10px;
+
+    background-color: white;
+}
+
+.menu-item {
+    width: 40px;
+    height: 40px;
+
+    background-color: #c2ffc8;
+}
+
+/* 中央 */
+.main {
+    display: flex;
+
+    width: 400px;
+    height: 250px;
+}
+
+.sidebar {
+    width: 150px;
+    height: 250px;
+
+    background-color: #9dddf4;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 250px;
+    height: 250px;
+    padding-top: 40px;
+    padding-left: 40px;
+
+    background-color: #c2ffc8;
+}
+
+.card {
+    width: 150px;
+    height: 50px;
+    padding: 5px;
+
+    background-color: white;
+}
+
+.card-inner {
+    width: 140px;
+    height: 40px;
+
+    background-color: #ffc2c5;
+}
+
+/* 下部 */
+.footer {
+    width: 400px;
+    height: 100px;
+
+    background-color: #bea5ff;
+}
+
+
+/* ウィンドウ幅が479px以下の場合 */
+@media screen and (max-width: 479px) {
+    .container {
+        width: 200px;
+        height: 600px;
+    }
+
+    /* オレンジ部分 */
+    .header {
+        justify-content: center;
+        align-items: center;
+
+        width: 200px;
+        height: 200px;
+        padding-right: 0;
+    }
+
+    /* メニューを縦並びに変更 */
+    .header-menu {
+        flex-direction: column;
+        gap: 10px;
+
+        width: 60px;
+        height: 160px;
+        padding: 10px;
+    }
+
+    .menu-item {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* 中央部分を縦並びに変更 */
+    .main {
+        flex-direction: column;
+
+        width: 200px;
+        height: 300px;
+    }
+
+    /* 青色部分 */
+    .sidebar {
+        width: 200px;
+        height: 100px;
+    }
+
+    /* 緑色部分 */
+    .content {
+        gap: 10px;
+
+        width: 200px;
+        height: 200px;
+        padding-top: 20px;
+        padding-left: 30px;
+    }
+
+    /* 白いカード */
+    .card {
+        width: 140px;
+        height: 50px;
+        padding: 5px;
+    }
+
+    /* ピンク色部分 */
+    .card-inner {
+        width: 130px;
+        height: 40px;
+    }
+
+    /* 紫色部分 */
+    .footer {
+        width: 200px;
+        height: 100px;
+    }
+}

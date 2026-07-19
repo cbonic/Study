@@ -1,0 +1,190 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    width: 400px;
+}
+
+/* 上部 */
+.top {
+    width: 400px;
+    height: 100px;
+    background-color: #ffce7a;
+}
+
+/* 中央全体 */
+.middle {
+    display: flex;
+    width: 400px;
+    height: 250px;
+}
+
+/* 左側 */
+.left {
+    width: 150px;
+    height: 250px;
+    background-color: #9dddf4;
+}
+
+/* 中央右側 */
+.right {
+    width: 250px;
+    height: 250px;
+}
+
+.right-top {
+    display: flex;
+    width: 250px;
+    height: 150px;
+}
+
+.center {
+    width: 150px;
+    height: 150px;
+}
+
+.green {
+    width: 150px;
+    height: 50px;
+    background-color: #c2ffc8;
+}
+
+.pink {
+    width: 150px;
+    height: 100px;
+    background-color: #ffc2c5;
+}
+
+.red {
+    width: 100px;
+    height: 150px;
+    background-color: #f89c9c;
+}
+
+.yellow {
+    width: 250px;
+    height: 100px;
+    background-color: #fff083;
+}
+
+/* 下部 */
+.bottom {
+    width: 400px;
+    height: 100px;
+    background-color: #bea5ff;
+}
+
+
+/* ウィンドウ幅が767px以下の場合 */
+@media screen and (max-width: 767px) {
+    .container,
+    .top,
+    .middle,
+    .bottom {
+        width: 300px;
+    }
+
+    .left {
+        width: 100px;
+    }
+
+    .right {
+        width: 200px;
+    }
+
+    .right-top {
+        width: 200px;
+    }
+
+    .center {
+        width: 125px;
+    }
+
+    .green,
+    .pink {
+        width: 125px;
+    }
+
+    .red {
+        width: 75px;
+    }
+
+    .yellow {
+        width: 200px;
+    }
+}
+
+
+/* ウィンドウ幅が479px以下の場合 */
+@media screen and (max-width: 479px) {
+    .container,
+    .top,
+    .middle,
+    .left,
+    .right,
+    .right-top,
+    .center,
+    .green,
+    .pink,
+    .red,
+    .yellow,
+    .bottom {
+        width: 150px;
+    }
+
+    .middle {
+        display: flex;
+        flex-direction: column;
+        height: 450px;
+    }
+
+    .left {
+        height: 100px;
+    }
+
+    .right {
+        display: flex;
+        flex-direction: column;
+        height: 350px;
+    }
+
+    /*
+      right-topの箱自体をレイアウトから外して、
+      centerとredをrightの中で並べ替えられるようにする
+    */
+    .right-top {
+        display: contents;
+    }
+
+    .red {
+        order: 1;
+        height: 100px;
+    }
+
+    .center {
+        order: 2;
+        height: 150px;
+    }
+
+    .green {
+        height: 50px;
+    }
+
+    .pink {
+        height: 100px;
+    }
+
+    .yellow {
+        order: 3;
+        height: 100px;
+    }
+
+    .bottom {
+        height: 100px;
+    }
+}

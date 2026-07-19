@@ -1,0 +1,101 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    width: 400px;
+    height: 450px;
+}
+
+/* 上部 */
+.header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    width: 400px;
+    height: 100px;
+    padding-right: 20px;
+
+    background-color: #ffce7a;
+}
+
+/* 上部の白いボックス */
+.header-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 160px;
+    height: 60px;
+    padding: 10px;
+
+    background-color: white;
+}
+
+/* 上部の緑色のボックス */
+.menu-item {
+    width: 40px;
+    height: 40px;
+
+    background-color: #c2ffc8;
+}
+
+/* 中央全体 */
+.main {
+    display: flex;
+
+    width: 400px;
+    height: 250px;
+}
+
+/* 左側 */
+.sidebar {
+    width: 150px;
+    height: 250px;
+
+    background-color: #9dddf4;
+}
+
+/* 右側 */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 250px;
+    height: 250px;
+    padding-top: 40px;
+    padding-left: 40px;
+
+    background-color: #c2ffc8;
+}
+
+/* 白い外側のボックス */
+.card {
+    width: 150px;
+    height: 50px;
+    padding: 5px;
+
+    background-color: white;
+}
+
+/* ピンク色の内側のボックス */
+.card-inner {
+    width: 140px;
+    height: 40px;
+
+    background-color: #ffc2c5;
+}
+
+/* 下部 */
+.footer {
+    width: 400px;
+    height: 100px;
+
+    background-color: #bea5ff;
+}
