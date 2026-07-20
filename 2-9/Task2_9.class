@@ -13,10 +13,10 @@ public class Task2_9 {
    private static final String FRI = "金曜日";
    private static final String SAT = "土曜日";
    private static final String SUN = "日曜日";
-   private static final String MSG_WEEKDAY = "平日営業：9:00〜18:00";
-   private static final String MSG_SATURDAY = "土曜営業：10:00〜17:00";
-   private static final String MSG_SUNDAY = "定休日";
-   private static final String MSG_ERROR = "エラー：不正な曜日です";
+   private static final String MSG_WEEKDAY = "Working Hours: 9:00-18:00";
+   private static final String MSG_SATURDAY = "Saturday Hours:10:00-17:00";
+   private static final String MSG_SUNDAY = "Closed";
+   private static final String MSG_ERROR = "Error: No Valid Day";
 
    public Task2_9() {
    }
@@ -46,16 +46,16 @@ public class Task2_9 {
          case "水曜日":
          case "木曜日":
          case "金曜日":
-            System.out.println("平日営業：9:00〜18:00");
+            System.out.println("Working Hours: 9:00-18:00");
             break;
          case "土曜日":
-            System.out.println("土曜営業：10:00〜17:00");
+            System.out.println("Saturday Hours:10:00-17:00");
             break;
          case "日曜日":
-            System.out.println("定休日");
+            System.out.println("Closed");
             break;
          default:
-            System.out.println("エラー：不正な曜日です");
+            System.out.println("Error: No Valid Day");
       }
 
    }
