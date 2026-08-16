@@ -10,7 +10,7 @@ import java.util.HashMap;
  * 問①～問④まであります。
  * 
  */
-public class Task2_21 {
+public class Task2_24 {
     
     public static final String orange = "オレンジ";
     public static final String grape = "ぶどう";
