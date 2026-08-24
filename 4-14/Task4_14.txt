@@ -1,0 +1,22 @@
+① 例外とは何かを説明して下さい。
+回答:
+プログラムの実行中に発生する、通常の処理を継続できなくなるようなエラーや異常な状態のことです。Javaでは、例外をtry-catchなどで処理することができます。
+
+
+② Whitelabel Error Page が表示される主な原因を、2つ以上挙げて下さい。
+回答:
+・アクセスしたURLに対応するControllerやマッピングが存在しない場合。
+・Controllerなどの処理中に例外が発生した場合。
+・表示するテンプレートが存在しない、または正しく指定されていない場合。
+
+③ ArrayIndexOutOfBoundsException が発生する主な原因を簡潔に説明して下さい。
+回答:
+配列の有効な範囲を超えたインデックスにアクセスした場合に発生します。
+
+④ 次のコンソールでのエラーメッセージから、発生しているエラーの種類と原因を答えて下さい。
+
+Exception in thread "main" java.lang.NumberFormatException: For input string: "abc"
+	at com.example.demo.controller.SubjectController.subjectList(SubjectController.java:38)
+
+回答:
+NumberFormatExceptionが発生しています。数値に変換できない文字列 "abc" を、Integer.parseInt()などを使用して数値に変換しようとしたことが原因と考えられます。エラーはSubjectController.javaの38行目で発生しています。
