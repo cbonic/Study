@@ -1,0 +1,9 @@
+ReviewController
+       │
+       │ 依存
+       ▼
+ ReviewService
+    │       │
+    │       └──────────► ProductMapper
+    ▼
+ReviewMapper

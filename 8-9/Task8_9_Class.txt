@@ -1,0 +1,21 @@
+User                         Product
+─────────────                ─────────────
+- id: int                    - id: int
+...                          ...
+      1                            1
+      │                            │
+      │ 0..*                       │ 0..*
+      └─────────┐        ┌─────────┘
+                │        │
+             Review
+        ─────────────────────
+        - id: int
+        - userId: int
+        - productId: int
+        - rating: int
+        - comment: String
+        - postedAt: LocalDateTime
+        ─────────────────────
+        + getId(): int
+        + getRating(): int
+        + getComment(): String
