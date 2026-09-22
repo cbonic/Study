@@ -1,0 +1,250 @@
+【1. N+1問題の原因と改善】
+
+現在の処理では、最初に当月の注文を約800,000件取得した後、
+各注文ごとに会員情報を取得するSQLを実行しています。
+
+そのため、
+
+注文取得：1回
+会員取得：約800,000回
+
+となり、合計約800,001回のSQLが発行されます。
+
+これがN+1問題です。
+
+orders と members をJOINし、1回のSQLで必要な情報を取得するようにします。
+
+
+SELECT
+    o.id,
+    o.member_id,
+    o.order_date,
+    o.total_amount,
+    m.name,
+    m.rank,
+    m.region
+FROM orders o
+JOIN members m
+    ON o.member_id = m.id
+WHERE o.order_date BETWEEN '2026-05-01' AND '2026-05-31'
+  AND o.status = '発送済';
+
+
+これにより、注文ごとにmembersを検索する必要がなくなり、
+大量のSQL発行を防ぐことができます。
+
+
+【2. EXPLAIN の各行】
+
+■ orders（o）
+
+type = ALL のため、
+30,000,000件のordersをフルテーブルスキャンしています。
+
+order_date と status に適切なインデックスがないため、
+対象月かつ発送済の注文を効率的に絞り込めていません。
+
+また、GROUP BYおよびORDER BYの処理により
+Using temporary、Using filesort が発生しています。
+
+
+■ members（m）
+
+type = ALL となり、
+2,000,000件のmembersをスキャンしています。
+
+members.id はPRIMARY KEYですが、
+現在の実行計画では効率的なインデックス結合が行われず、
+Using join buffer が発生しています。
+
+
+■ order_items（oi）
+
+type = ALL のため、
+90,000,000件をフルテーブルスキャンしています。
+
+orders.id と結合する order_id にインデックスがないため、
+対象注文の商品明細を効率的に検索できません。
+
+
+■ products（p）
+
+type = ALL のため、
+150,000件のproductsをフルテーブルスキャンしています。
+
+order_items.product_id と products.id のJOINで
+効率的なインデックス結合が行われていません。
+
+
+■ categories（c）
+
+type = ALL のため、
+200件のcategoriesをスキャンしています。
+
+categories自体は小さいテーブルですが、
+JOIN全体の実行計画が効率化されていません。
+
+
+【3. 問題点】
+
+1. N+1問題により、会員情報取得SQLが約800,000回実行されている。
+
+2. orders の order_date と status に適切なインデックスがなく、
+   30,000,000件をフルスキャンしている。
+
+3. order_items.order_id にインデックスがなく、
+   90,000,000件の大規模テーブルをフルスキャンしている。
+
+4. order_items.product_id に適切なインデックスがなく、
+   productsとのJOINを効率化できていない。
+
+5. products.category_id に適切なインデックスがなく、
+   categoriesとのJOINを効率化できていない。
+
+6. GROUP BY と ORDER BY により
+   Using temporary / Using filesort が発生している。
+
+7. 月次レポートを生成するたびに大量の明細データから
+   集計をやり直している。
+
+
+【4. 改善策と優先順位】
+
+■ 優先度1：N+1問題の解消
+
+800,000回発行されているmembers検索を廃止し、
+ordersとmembersをJOINして1回のSQLで取得します。
+
+SQL発行回数を大幅に削減できるため、
+最優先で改善します。
+
+
+■ 優先度2：orders の検索条件をインデックス化
+
+月次検索で使用する order_date と status に
+複合インデックスを追加します。
+
+CREATE INDEX idx_orders_date_status
+ON orders(order_date, status);
+
+これにより30,000,000件すべてを検索せず、
+対象期間の注文を絞り込めます。
+
+
+■ 優先度3：order_items.order_id のインデックス追加
+
+CREATE INDEX idx_order_items_order
+ON order_items(order_id);
+
+ordersからorder_itemsを検索する際に、
+90,000,000件のフルスキャンを避けるため重要です。
+
+
+■ 優先度4：order_items.product_id のインデックス追加
+
+CREATE INDEX idx_order_items_product
+ON order_items(product_id);
+
+productsとのJOINを効率化します。
+
+
+■ 優先度5：products.category_id のインデックス追加
+
+CREATE INDEX idx_products_category
+ON products(category_id);
+
+categoriesとのJOINを効率化します。
+
+
+■ 優先度6：集計処理自体の見直し
+
+GROUP BYおよびORDER BYによる一時テーブル・ソート処理は、
+インデックスだけでは完全に解消できない可能性があります。
+
+月次レポートを頻繁に生成する場合は、
+事前集計したデータを利用する方法も検討します。
+
+
+【5. DDL】
+
+CREATE INDEX idx_orders_date_status
+ON orders(order_date, status);
+
+CREATE INDEX idx_order_items_order
+ON order_items(order_id);
+
+CREATE INDEX idx_order_items_product
+ON order_items(product_id);
+
+CREATE INDEX idx_products_category
+ON products(category_id);
+
+
+【6. 改善後の type の予測】
+
+orders:
+ALL → range
+
+order_date の範囲検索に複合インデックスを利用します。
+
+
+members:
+ALL → eq_ref
+
+members.id はPRIMARY KEYのため、
+各orderのmember_idに対して1件を取得できます。
+
+
+order_items:
+ALL → ref
+
+idx_order_items_order を利用して、
+各order_idに対応する明細を取得できます。
+
+
+products:
+ALL → eq_ref
+
+products.id はPRIMARY KEYのため、
+各product_idに対応する1件を取得できます。
+
+
+categories:
+ALL → eq_ref
+
+categories.id はPRIMARY KEYのため、
+各category_idに対応する1件を取得できます。
+
+
+【7. インデックス以外の改善方法】
+
+■ サマリーテーブル
+
+月次・会員ランク・地域・カテゴリ単位などで
+売上を事前集計したサマリーテーブルを作成します。
+
+レポート作成時に90,000,000件のorder_itemsを毎回集計する必要がなくなり、
+大幅な高速化が期待できます。
+
+
+■ パーティショニング
+
+orders や order_items のような巨大テーブルについて、
+日付などを基準にパーティションを分割する方法を検討できます。
+
+特に月単位の検索が多い場合、
+検索対象となるデータ範囲を限定できます。
+
+
+■ キャッシュ
+
+同じ月次レポートを繰り返し表示する場合は、
+一度計算した結果をキャッシュし、
+毎回同じ集計SQLを実行しないようにします。
+
+
+■ バッチでの事前集計
+
+リアルタイムに全データを集計するのではなく、
+日次などで集計結果を保存し、
+月次レポートではその集計結果を合算する方法も有効です。

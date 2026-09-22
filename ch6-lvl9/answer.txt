@@ -1,0 +1,108 @@
+【1. SQL-A の問題点】
+
+■ categories（c）
+
+type が ALL になっているため、categories テーブルを
+フルテーブルスキャンしています。
+
+WHERE句では c.name = '家電' を条件にしていますが、
+name カラムにインデックスが存在しないため、
+全80件から対象カテゴリを検索しています。
+
+categories は80件と小さいため影響は比較的小さいですが、
+name にインデックスを設定することで検索を効率化できます。
+
+
+■ products（p）
+
+products も type が ALL となっており、
+300,000件をフルテーブルスキャンしています。
+
+結合条件として category_id、
+検索条件として price と is_active を使用していますが、
+これらに適切なインデックスが存在しないためです。
+
+
+【2. SQL-B で stocks が ALL になっている理由】
+
+stocks では、
+
+quantity < reorder_point
+
+という同じ行の2つのカラムを比較しています。
+
+idx_warehouse は warehouse_id のインデックスですが、
+WHERE句では warehouse_id による絞り込みを行っていません。
+
+そのため possible_keys に idx_warehouse が表示されていても、
+今回の検索条件を効率的に絞り込むためには利用できず、
+3,600,000件のフルテーブルスキャンが発生しています。
+
+
+【3. SQL-A の改善】
+
+categories.name の検索用インデックスを追加します。
+
+CREATE INDEX idx_category_name
+ON categories(name);
+
+products には category_id、is_active、price を利用する
+複合インデックスを追加します。
+
+CREATE INDEX idx_product_category_active_price
+ON products(category_id, is_active, price);
+
+category_id と is_active は等価条件、
+price は範囲条件として使用されるため、
+この順序で複合インデックスを構成します。
+
+
+【4. SQL-B の改善】
+
+products とのJOINでは stocks.product_id が使用されるため、
+product_id にインデックスを追加します。
+
+CREATE INDEX idx_stock_product
+ON stocks(product_id);
+
+また、products 側では is_active を条件として使用するため、
+必要に応じて is_active を含むインデックスを検討できます。
+
+CREATE INDEX idx_product_active
+ON products(is_active);
+
+ただし、
+
+quantity < reorder_point
+
+は同一行の2カラム間の比較であるため、
+通常の quantity または reorder_point のインデックスだけでは
+効率的な絞り込みは困難です。
+
+発注点割れの検索が頻繁に行われる場合は、
+発注点割れかどうかを表すフラグを別途保持して
+インデックスを設定する方法なども検討できます。
+
+
+【5. SQL-A と SQL-B の共通点・相違点】
+
+■ 共通点
+
+どちらも適切なインデックスが不足しているため、
+大きなテーブルでフルテーブルスキャンが発生しています。
+
+また、JOINで使用するカラムに適切なインデックスを設定することで、
+結合処理を効率化できます。
+
+
+■ 相違点
+
+SQL-A は検索条件が固定値との比較であるため、
+category_id、is_active、price などに複合インデックスを設定することで
+効率的に絞り込むことができます。
+
+一方SQL-Bの quantity < reorder_point は、
+同一行の2カラム同士を比較する条件です。
+この条件は通常のインデックスでは直接効率化しにくいため、
+インデックス追加だけでなく、
+発注点割れを示すフラグや別のデータ設計を検討する必要があります。
