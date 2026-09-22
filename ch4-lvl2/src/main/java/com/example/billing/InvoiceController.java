@@ -37,7 +37,7 @@ public class InvoiceController {
      */
     public void handleApprove(String invoiceId) {
         log.info("請求書承認リクエスト受信: invoiceId={}", invoiceId);
-        Invoice approvedInvoice = service.approve(invoiceId);
+        String approvedInvoice = service.approve(invoiceId);
         log.info("請求書承認完了: invoiceId={}", invoiceId);
     }
 }

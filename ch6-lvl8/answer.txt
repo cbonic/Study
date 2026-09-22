@@ -1,0 +1,140 @@
+【1. 現在の EXPLAIN の各行】
+
+■ orders（o）
+
+type が ALL となっているため、
+orders テーブル8,000,000件をフルテーブルスキャンしています。
+
+WHERE句では order_date と status を条件として使用していますが、
+これらを効率よく検索するためのインデックスが存在しないため、
+大量の行を確認する必要があります。
+
+また、Extra に
+Using where; Using temporary; Using filesort
+が表示されています。
+
+
+■ members（m）
+
+type が ALL となっており、
+members テーブル500,000件をフルスキャンしています。
+
+orders.member_id と members.id を結合していますが、
+現在の実行計画では PRIMARY KEY が利用されていません。
+
+Using join buffer が表示されており、
+効率的なインデックス結合が行われていません。
+
+
+■ order_items（oi）
+
+type が ALL となっており、
+order_items テーブル24,000,000件をフルスキャンしています。
+
+orders.id と order_items.order_id を結合していますが、
+order_id にインデックスが存在しないため、
+効率的に対象行を検索できません。
+
+そのため Using join buffer が発生しています。
+
+
+【2. Using temporary / Using filesort の理由】
+
+クエリでは以下の並び替えを行っています。
+
+ORDER BY o.order_date DESC, m.name
+
+現在、この並び順をそのまま利用できる適切なインデックスがないため、
+MySQLは検索結果を並び替える必要があります。
+
+また、複数テーブルを結合した結果を並び替えるため、
+一時的な結果を保持する処理が必要となり、
+Using temporary および Using filesort が発生しています。
+
+
+【3. 追加するインデックス】
+
+① orders の検索条件用インデックス
+
+order_date と status を使用して検索対象の注文を絞り込むため、
+複合インデックスを追加します。
+
+CREATE INDEX idx_order_date_status
+ON orders(order_date, status);
+
+
+② members の結合用インデックス
+
+orders.member_id と members.id を結合するために
+members.id のインデックスを使用します。
+
+members.id は PRIMARY KEY として定義されているため、
+既にインデックスが存在します。
+
+
+③ order_items の結合用インデックス
+
+orders.id と order_items.order_id の結合を高速化するため、
+order_id にインデックスを追加します。
+
+CREATE INDEX idx_order_id
+ON order_items(order_id);
+
+
+【4. DDL】
+
+CREATE INDEX idx_order_date_status
+ON orders(order_date, status);
+
+CREATE INDEX idx_order_id
+ON order_items(order_id);
+
+members.id については PRIMARY KEY が既に存在するため、
+新しいインデックスを追加する必要はありません。
+
+
+【5. 改善後の EXPLAIN 予測】
+
+■ orders
+
+type:
+range
+
+key:
+idx_order_date_status
+
+rows:
+約180,000
+
+Extra:
+Using index condition; Using filesort
+
+
+■ members
+
+type:
+eq_ref
+
+key:
+PRIMARY
+
+rows:
+1
+
+Extra:
+空欄
+
+
+■ order_items
+
+type:
+ref
+
+key:
+idx_order_id
+
+rows:
+約3
+
+Extra:
+空欄

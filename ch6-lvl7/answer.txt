@@ -1,0 +1,60 @@
+【1. rows が 50,000 になっている理由】
+
+現在は customer_id 単体のインデックス idx_customer_id が使用されています。
+
+customer_id = 2048 に該当する注文が平均約50,000件存在するため、
+インデックスを使用しても約50,000行を検索対象として確認する必要があります。
+
+
+【2. Using where が表示される理由】
+
+idx_customer_id には customer_id の情報しか含まれていないため、
+customer_id で絞り込んだ後、status = '処理中' の条件を追加で評価する必要があります。
+
+そのため Using where が表示されます。
+
+customer_id と status の両方を検索条件として使用しているため、
+customer_id 単体のインデックスだけでは十分に絞り込むことができません。
+
+
+【3. 複合インデックス】
+
+customer_id と status を組み合わせた複合インデックスを追加します。
+
+CREATE INDEX idx_cust_status
+ON orders(customer_id, status);
+
+
+【4. カラム順序について】
+
+customer_id → status の順にすることで、
+まず customer_id で対象の注文を絞り込み、
+さらにその中から status を使って絞り込むことができます。
+
+customer_id は特定の顧客を検索する条件として使用され、
+status よりも値の種類が多く、検索対象を効率よく限定できます。
+
+一方、status は「受付済」「処理中」「発送済」「キャンセル」の
+4種類しかないため、status → customer_id の順にすると、
+最初の status だけでは多数の行が検索対象になります。
+
+今回の検索条件では
+(customer_id, status) の順の複合インデックスが適しています。
+
+
+【5. 改善後の EXPLAIN 予測】
+
+type:
+ref
+
+possible_keys:
+idx_customer_id, idx_cust_status
+
+key:
+idx_cust_status
+
+rows:
+約12,000
+
+Extra:
+Using index
